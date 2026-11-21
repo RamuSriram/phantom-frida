@@ -1329,6 +1329,16 @@ def apply_stability_fixes(frida_dir: Path, frida_major: int):
 
 
 def apply_post_build_patches(frida_dir: Path, custom_name: str):
+    # Force the declaration to match the renamed calls
+    for pattern in [
+        "VALA_EXTERN void frida_agent_main",
+        "void frida_agent_main",
+        "frida_agent_main (",
+    ]:
+        count = replace_in_tree(frida_dir, pattern, pattern.replace("frida_agent_main", f"{custom_name}_agent_main"), include_build=True)
+        if count:
+            log(f"  Fixed declaration: {pattern} -> {custom_name}_agent_main ({count}x)", "OK")
+
     """Patch frida_agent_main symbol (generated during first build).
 
     Must include build/ directory because:
