@@ -1,4 +1,4 @@
-successfully downloaded text file (SHA: 2ec692d1ea03a50d074bfdd8189751062d525544)#!/usr/bin/env python3
+#!/usr/bin/env python3
 """
 Custom Frida Builder — build anti-detection Frida server from source.
 
