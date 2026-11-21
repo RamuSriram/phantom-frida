@@ -1973,12 +1973,21 @@ Transformations and verification boundaries:
             log("=" * 60, "HEADER")
             log(f"Building for {arch}", "STEP")
             log("=" * 60, "HEADER")
-            
+        
             # Wipe previous configure so next arch can reconfigure
             build_dir = frida_dir / "build"
             if build_dir.exists():
                 shutil.rmtree(build_dir)
-                
+        
+            # Restore agent-glue.c so first build sees frida_agent_main
+            agent_glue = frida_dir / "subprojects/frida-core/lib/agent/agent-glue.c"
+            if agent_glue.exists():
+                text = agent_glue.read_text(encoding="utf-8", errors="ignore")
+                if f"{custom_name}_agent_main" in text:
+                    text = text.replace(f"{custom_name}_agent_main", "frida_agent_main")
+                    agent_glue.write_text(text, encoding="utf-8")
+                    log("  Restored frida_agent_main in agent-glue.c", "OK")
+        
             # Configure
             configure_arch(frida_dir, arch, ndk_path)
 
