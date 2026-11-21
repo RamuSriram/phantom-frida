@@ -1954,7 +1954,12 @@ Transformations and verification boundaries:
             log("=" * 60, "HEADER")
             log(f"Building for {arch}", "STEP")
             log("=" * 60, "HEADER")
-
+            
+            # Wipe previous configure so next arch can reconfigure
+            build_dir = frida_dir / "build"
+            if build_dir.exists():
+                shutil.rmtree(build_dir)
+                
             # Configure
             configure_arch(frida_dir, arch, ndk_path)
 
