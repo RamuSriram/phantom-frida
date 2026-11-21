@@ -685,6 +685,15 @@ def patch_zymbiote_artifacts(frida_dir: Path, custom_name: str) -> None:
 
 
 def apply_source_patches(frida_dir: Path, custom_name: str):
+    # Keep agent-glue.c calling frida_agent_main for the first build.
+    # Post-build patches will rename both the call and the declaration together.
+    agent_glue = frida_dir / "subprojects/frida-core/lib/agent/agent-glue.c"
+    if agent_glue.exists():
+        text = agent_glue.read_text(encoding="utf-8", errors="ignore")
+        if f"{custom_name}_agent_main" in text:
+            text = text.replace(f"{custom_name}_agent_main", "frida_agent_main")
+            agent_glue.write_text(text, encoding="utf-8")
+            log("  Restored frida_agent_main in agent-glue.c for first build", "OK")
     """Apply global recursive string replacements across the source tree."""
     log("=" * 60, "HEADER")
     log("PHASE 1: Global source patches", "STEP")
